@@ -5,8 +5,6 @@ from debtapi.views import DebtViewSet
 
 
 router = DefaultRouter()
-router.register(r'', DebtViewSet, basename='debt')  
+router.register(r'debt', DebtViewSet, basename='debt')  
 
-urlpatterns = [
-    path('', include(router.urls)),
-]
+urlpatterns = [path('', include(router.urls))]
