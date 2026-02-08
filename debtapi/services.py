@@ -1,5 +1,7 @@
 import requests
 
+from helpers import CacheManager
+
 
 class DebtAPIService:
 
@@ -47,7 +49,6 @@ class DebtAPIService:
 
         return cls._fetch_debt_from_third_party(indicator)
     
-    
     @classmethod
     def fetch_debt(cls,  param=None):
         country = param.get('country', 'NGA').upper() if param else 'NGA'
@@ -55,6 +56,12 @@ class DebtAPIService:
         multilateral_total = cls.fetch_agg('DT.DOD.MLAT.CD')
         bilateral_total = cls.fetch_agg('DT.DOD.BLAT.CD')
         private_total = cls.fetch_agg('DT.DOD.PRVT.CD')  # Or DT.DOD.PPNG.CD for PPG private
+
+        cache_key = f"debt_{country}"
+        result = CacheManager.retrieve_key(cache_key)
+        
+        if result:
+            return result
 
         # Specific multilaterals
         imf = cls._fetch_debt_from_third_party(
@@ -83,7 +90,7 @@ class DebtAPIService:
         # known_multilateral = imf['value'] + world_bank['value']  
         known_bilateral = sum(d['value'] for d in bilateral_details.values())
 
-        return {
+        result = {
             'country': country,
             'latest_year': total_external.get('year', 'N/A'),
             'grand_total_external_debt_usd': total_external,
@@ -105,3 +112,10 @@ class DebtAPIService:
                 'Bilateral details show major reported creditors only; full list via counterpart-area API.'
             ]
         }
+
+        CacheManager.set_key(
+            cache_key,
+            result
+        )
+
+        return result
