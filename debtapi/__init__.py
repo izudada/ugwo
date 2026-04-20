@@ -1,3 +1,3 @@
-from debtapi.services import DebtAPIService
+from debtapi.services.service import DebtAPIService
 
 __all__ = ['DebtAPIService']
