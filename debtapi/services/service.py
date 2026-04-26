@@ -14,6 +14,11 @@ class DebtAPIService:
         end_year = param.get('end_year')
 
         date_param = str(year.year) if year else None
+        cache_key = f"debt:{country}:{date_param}"
+
+        cached_data = CacheManager.retrieve_key(cache_key)
+        if cached_data is not None:
+            return cached_data
 
         source = DataSource.WORLD_BANK 
         result = WorldBankService._fetch_single(
@@ -42,8 +47,8 @@ class DebtAPIService:
         #         bilateral_details[code] = debt
 
         # known_bilateral = sum(d.get('value', 0) for d in bilateral_details.values())
-  
-        return {
+
+        response = {
             'country': country,
             'requested_year': year or (f"{start_year}-{end_year}" if start_year else 'latest'),
             'total_external_debt_usd': f"{result:,.0f}",
@@ -63,6 +68,11 @@ class DebtAPIService:
                 # 'Use ?year=2023 or ?start_year=2018&end_year=2024 for historical data.'
             ]
         }
+
+        CacheManager.set_key(
+            cache_key, response, timeout=24*3600
+        ) 
+        return response
     
     @classmethod
     def fetch_from_imf(cls, param):
