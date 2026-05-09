@@ -44,9 +44,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # ...
+  
     'rest_framework',
+
     'debtapi',
+    'authentication',
 ]
 
 MIDDLEWARE = [
@@ -136,3 +138,5 @@ CACHES = {
         }
     }
 }
+
+AUTH_USER_MODEL = "authentication.User"

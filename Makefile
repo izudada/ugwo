@@ -28,9 +28,8 @@ down:
 shell:
 	docker-compose exec web python manage.py shell
 
-shell-plus:
-	$(COMPOSE) exec $(SERVICE) python manage.py shell_plus
-	
+migrations:
+	docker-compose exec web python manage.py makemigrations
 
 migrate:
 	docker-compose exec web python manage.py migrate
